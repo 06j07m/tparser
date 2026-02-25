@@ -1,4 +1,5 @@
 ﻿import pandas as pd
+from unicodedata import normalize
 
 # HELPER FUNCTIONS
 def extract_suffixes(filepath: str, column : str) -> list[str]:
@@ -56,22 +57,31 @@ suffixes = extract_suffixes("suffixes.csv", "suffix")
 
 
 # BASIC PARSING STEPS (?)
+def endswith_normalized(s1: str, s2: str) -> bool:
+    '''
+    Return true if s1 ends with s2, after normalizing unicode accents
+    '''
+    s1_norm = normalize("NFKC", s1).casefold()
+    s2_norm = normalize("NFKC", s2).casefold()
+    return s1_norm.endswith(s2_norm)
+
+
 def parse_ending(word: list[str], ending: str) -> tuple[bool, list[str]]:
     '''
     Parse 0 or 1 repetitions of the ending from the right of the word
     '''
     base = word[0]
+    parsed = []
 
-    if base.endswith(ending):
+    if endswith_normalized(base, ending):
         # split it right before the ending
         split_at = len(base) - len(ending)
-        parsed = [base[:split_at], base[split_at:]]
+        parsed.append(base[:split_at])
+        parsed.append(base[split_at:])
 
         # if there are other parts that are already split, add them
         if len(word) > 1:
             parsed.append(word[1:][0])
-    else:
-        parsed = []
 
     # signal whether parsing worked or not
     parse_success = len(parsed) > 0
@@ -91,12 +101,13 @@ def parse_endings(word_variations: list[list[str]], endings: list[str]) -> tuple
             parse_success, parsed = parse_ending(word, endg)
             if parse_success:
                 parsed_variations.append(parsed)
+            print("parsing:", word, endg, parse_success)
 
-    # also add unchanged version
-    parsed_variations.append(word)
+        # also add unchanged version
+        parsed_variations.append(word)
 
     # signal whether parsing worked or not
-    parse_success = len(parsed_variations) > 1
+    parse_success = len(parsed_variations) > len(word_variations)
 
     return parse_success, parsed_variations
 
@@ -130,7 +141,8 @@ def parse_vowel_right(word: list[list[str]]) -> list[list[str]]:
 
     parse_success, result_short = parse_endings(word,
                                                 vowels + vowels_high)
-    return result_long
+    print("fdsfds", result_short)
+    return result_short
 
 
 # TESTING
@@ -141,16 +153,14 @@ def parse_word(word: list[list[str]]) -> list[list[str]]:
     print("last cons", set2)
     set3 = parse_vowel_right(set2)
     print("vowel", set3)
-    set4 = parse_consonant_right(set3)
-    print("2nd last cons", set4)
 
-    return set4
+    return set3
 
 
 if __name__ == "__main__":
     test_verbs, test_roots = extract_test_data("test_data_swanton.csv")
 
-    for verb in test_verbs:
+    for verb in test_verbs[:6]:
         print("original", [[verb]])
         parse_word([[verb]])
         print("-----------------")

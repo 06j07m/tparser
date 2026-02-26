@@ -1,5 +1,5 @@
 ﻿import pandas as pd
-from unicodedata import normalize
+import unicodedata as ucd
 
 # HELPER FUNCTIONS
 def extract_suffixes(filepath: str, column : str) -> list[str]:
@@ -47,10 +47,10 @@ def print_word(word: list[list[str]]) -> None:
 
 
 # ALPHABET AND SYLLABLE CONSTANTS (?)    
-consonants_mult = ["dz", "ts", "ts'", "sh", "ch", "ch'", "dl", "tl", "tl'", "gw", 
-                   "kw", "k'w", "xw", "x'w", "g̲w", "ḵw", "ḵ'w", "x̲w", "x̲'w"]
-consonants_single = ["d", "t", "t'", "n", "s", "s'", "j", "l", "l'", "y", "g", "k'", 
-                     "x", "x'", "w", "g̲", "ḵ", "ḵ'", "x̲", "x̲'", ".", "h"]
+consonants_mult = ["dz", "ts", "tsʼ", "sh", "ch", "chʼ", "dl", "tl", "tlʼ", "gw", 
+                   "kw", "kʼw", "xw", "xʼw", "g̱w", "ḵw", "ḵʼw", "x̱w", "x̱ʼw"]
+consonants_single = ["d", "t", "tʼ", "n", "s", "sʼ", "j", "l", "lʼ", "y", "g", "kʼ", 
+                     "x", "xʼ", "w", "g̱", "ḵ", "ḵʼ", "x̱", "x̱ʼ", ".", "h"]
 
 vowels_long = ["ee", "ei", "aa", "oo"]
 vowels_high_long = ["ée", "éi", "áa", "óo"]
@@ -65,7 +65,24 @@ def normalize_str(word: str) -> str:
     '''
     Return a normalized form of the string
     '''
-    return normalize("NFKC", word).casefold()
+    # strip whitespace
+    norm_whitesp = word.strip()
+
+    # separate combining accents
+    norm_combining = ucd.normalize("NFKD", norm_whitesp)
+
+    # normalize captialization
+    norm_case = norm_combining.casefold()
+
+    # replace apostrophes with correct one
+    norm_apostrophe = norm_case.replace("'", "ʼ").replace("’", "ʼ")
+
+    # get rid of other accents
+    norm_noaccent = "".join([
+        c for c in norm_apostrophe if ucd.combining(c) and c != "̱"
+    ])
+
+    return norm_noaccent
 
 
 def parse_ending(word: list[str], ending: str) -> tuple[bool, list[str]]:
@@ -73,7 +90,6 @@ def parse_ending(word: list[str], ending: str) -> tuple[bool, list[str]]:
     Parse 0 or 1 repetitions of the ending from the right of the word
     '''
     base = word[0]
-    ending = normalize_str(ending)
     
     parsed = []
 
@@ -119,7 +135,7 @@ def parse_suffix(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
     return parse_endings(word, suffixes)
 
 
-def parse_consonant_right(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+def parse_last_consonant(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
     '''
     Parse last consonant from word variations
     '''
@@ -133,7 +149,7 @@ def parse_consonant_right(word: list[list[str]]) -> tuple[bool, list[list[str]]]
     return parse_endings(word, consonants_single)
 
 
-def parse_vowel_right(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+def parse_last_vowel(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
     '''
     Parse last vowel from word variations
     '''
@@ -147,6 +163,27 @@ def parse_vowel_right(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
     return parse_endings(word, vowels + vowels_high)
 
 
+def parse_last_syllable(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+    '''
+    Try to parse a consonant from the end of the word: CVC, CVVC, CV, or CVV
+    '''
+    # parse last consonant if it exists
+    parse_end_con_success, parsed_end_con = parse_last_consonant(word)
+
+    # parse vowel depending on whether consonant was parsed or not
+    if parse_end_con_success:
+        parse_vowel_success, parsed_vowel = parse_last_vowel(parsed_end_con)        
+    else:
+        parse_vowel_success, parsed_vowel = parse_last_vowel(word)
+
+    # if vowel wasn't parsed, invalid
+    if not parse_vowel_success:
+        return False, []
+    
+    # if vowel successfully parsed, continue with parsing first consonant
+    return parse_last_consonant(parsed_vowel)
+
+
 # def parse_word(word: list[list[str]]) -> list[list[str]]:
 #     parse_suffix()
 
@@ -157,5 +194,5 @@ if __name__ == "__main__":
 
     for verb in test_verbs[:10]:
         print(verb)
-        print(">>>> ", parse_vowel_right([[normalize_str(verb)]]))
+        print(">>>> ", parse_last_syllable([[normalize_str(verb)]]))
         print("---------------")

@@ -79,7 +79,7 @@ def normalize_str(word: str) -> str:
 
     # get rid of other accents
     norm_noaccent = "".join([
-        c for c in norm_apostrophe if ucd.combining(c) and c != "̱"
+        c for c in norm_apostrophe if not (ucd.combining(c) and c != "̱" and c != "́")
     ])
 
     return norm_noaccent
@@ -90,7 +90,6 @@ def parse_ending(word: list[str], ending: str) -> tuple[bool, list[str]]:
     Parse 0 or 1 repetitions of the ending from the right of the word
     '''
     base = word[0]
-    
     parsed = []
 
     if base.endswith(ending):
@@ -194,5 +193,11 @@ if __name__ == "__main__":
 
     for verb in test_verbs[:10]:
         print(verb)
-        print(">>>> ", parse_last_syllable([[normalize_str(verb)]]))
+        verbnorm = [[normalize_str(verb)]]
+        print(verbnorm)
+        parse_suf = parse_suffix(verbnorm)
+        parse_suf[1].extend(verbnorm)
+        print(">>>>", parse_suf[1])
+        parse_syl = parse_last_syllable(parse_suf[1])
+        print(">>>>", parse_syl[1])
         print("---------------")

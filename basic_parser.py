@@ -1,21 +1,20 @@
 ﻿import pandas as pd
 import unicodedata as ucd
+import json
+
+
+# ALPHABET AND SYLLABLE CONSTANTS + SUFFIX LIST
+with open("alphabet.json", "r") as alphabet_file:
+    ALPHABET = json.load(alphabet_file)
+with open("suffixes.json", "r") as suffixes_file:
+    SUFFIXES = json.load(suffixes_file)
+with open("vowels.json", "r") as vowels_file:
+    VOWELS = json.load(vowels_file)
+with open("consonants.json", "r") as consonants_file:
+    CONSONANTS = json.load(consonants_file)
+
 
 # HELPER FUNCTIONS
-def extract_suffixes(filepath: str, column : str) -> list[str]:
-    '''
-    Extract suffixes from a CSV given file name and column name
-    '''
-    # read csv into dataframe
-    suffix_df = pd.read_csv(filepath)
-
-    # get column as list
-    suffix_column = suffix_df.loc[:, column]
-
-    # only unique values
-    return suffix_column.unique().tolist()
-
-
 def extract_test_data(filepath: str) -> tuple[list[str], list[str]]:
     '''
     Extract test data into list of verbs and list of corresponding verb roots
@@ -31,36 +30,15 @@ def extract_test_data(filepath: str) -> tuple[list[str], list[str]]:
     return verb_col.to_list(), root_col.to_list()
 
 
-def extract_onecol_csv(filepath: str) -> list[str]:
-    '''
-    Extract the data from an arbitrary CSV file that only contains one column
-    '''
-    # read csv into dataframe
-    df = pd.read_csv(filepath)
-
-    # get first column and return it
-    return df.iloc[:,0].to_list()
-
-
 def print_word(word: list[list[str]]) -> None:
-    print(["-".join(w) for w in word])
+    print(["|".join(w).strip("|") for w in word])
 
 
-# ALPHABET AND SYLLABLE CONSTANTS (?)    
-consonants_mult = ["dz", "ts", "tsʼ", "sh", "ch", "chʼ", "dl", "tl", "tlʼ", "gw", 
-                   "kw", "kʼw", "xw", "xʼw", "g̱w", "ḵw", "ḵʼw", "x̱w", "x̱ʼw"]
-consonants_single = ["d", "t", "tʼ", "n", "s", "sʼ", "j", "l", "lʼ", "y", "g", "kʼ", 
-                     "x", "xʼ", "w", "g̱", "ḵ", "ḵʼ", "x̱", "x̱ʼ", ".", "h"]
-
-vowels_long = ["ee", "ei", "aa", "oo"]
-vowels_high_long = ["ée", "éi", "áa", "óo"]
-vowels = ["i", "e", "a", "u"]
-vowels_high = ["í", "é", "á", "ú"]
-
-suffixes = extract_suffixes("suffixes.csv", "suffix")
+def print_word_roots(word: list[list[str]]) -> None:
+    print([w[1] for w in word])
 
 
-# BASIC PARSING STEPS (?)
+# NORMALIZATION FUNCTIONS
 def normalize_str(word: str) -> str:
     '''
     Return a normalized form of the string
@@ -79,125 +57,141 @@ def normalize_str(word: str) -> str:
 
     # get rid of other accents
     norm_noaccent = "".join([
-        c for c in norm_apostrophe if not (ucd.combining(c) and c != "̱" and c != "́")
+        c for c in norm_apostrophe if c in ALPHABET["chars"]
     ])
 
     return norm_noaccent
 
 
-def parse_ending(word: list[str], ending: str) -> tuple[bool, list[str]]:
+# BASIC PARSING
+def parse_ending(word_variations: list[list[str]], ending: str, loc: int) -> list[list[str]]:
     '''
-    Parse 0 or 1 repetitions of the ending from the right of the word
-    '''
-    base = word[0]
-    parsed = []
-
-    if base.endswith(ending):
-        # split it right before the ending
-        split_at = len(base) - len(ending)
-        parsed.append(base[:split_at])
-        parsed.append(base[split_at:])
-
-        # if there are other parts that are already split, add them
-        if len(word) > 1:
-            parsed.extend(word[1:])
-
-    # signal whether parsing worked or not
-    parse_success = len(parsed) > 0
-
-    return parse_success, parsed
-
-
-def parse_endings(word_variations: list[list[str]], endings: list[str]) -> tuple[bool, list[list[str]]]:
-    '''
-    Parse 0 or 1 repetitions of each ending from the end of each variation
-    of the word
+    Try to parse given ending from the right of the word
     '''
     parsed_variations = []
 
     for word in word_variations:
-        for endg in endings:
-            parse_success, parsed = parse_ending(word, endg)
-            if parse_success and parsed not in parsed_variations:
-                parsed_variations.append(parsed)
-                
-    # signal whether parsing worked or not
-    parse_success = len(parsed_variations) > 0
+        base = word[0]
 
-    return parse_success, parsed_variations
+        # make new word template from old one
+        parsed = [w for w in word]
+
+        if base.endswith(ending):
+            # split it right before the ending
+            split_at = len(base) - len(ending)
+            
+            # update base and specified location to put the ending
+            parsed[0] = base[:split_at]
+            parsed[loc] = base[split_at:] + parsed[loc]
+
+             # add to list of possible results if successful
+            parsed_variations.append(parsed)
+            
+    return parsed_variations
 
 
-def parse_suffix(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+def parse_endings(word_variations: list[list[str]], endings: list[str], loc: int) -> list[list[str]]:
+    '''
+    Try to parse each ending from the right of the word
+    '''
+    parsed_variations = []
+
+    for endg in endings:
+        # try to parse each ending
+        parsed = parse_ending(word_variations, endg, loc)
+
+        # prevent duplicates being added
+        if parsed not in parsed_variations:
+            parsed_variations.extend(parsed)
+ 
+    return parsed_variations
+
+
+# MORE PARSING
+def parse_suffix(word_variations: list[list[str]]) -> list[list[str]]:
     '''
     Parse suffix from word variations
     '''
-    return parse_endings(word, suffixes)
+    return parse_endings(word_variations, SUFFIXES["suffixes"], 2)
 
 
-def parse_last_consonant(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+def parse_last_consonant(word: list[list[str]]) -> list[list[str]]:
     '''
     Parse last consonant from word variations
     '''
-    parse_success, result_mult = parse_endings(word, consonants_mult)
+    result_mult = parse_endings(word, CONSONANTS["multiple"], 1)
           
     # if multi-letter consonant is parsed, return without trying to parse one letter
-    if parse_success:
-       return parse_success, result_mult
+    if len(result_mult) > 0:
+       return result_mult
 
     # otherwise parse one letter only
-    return parse_endings(word, consonants_single)
+    return parse_endings(word, CONSONANTS["single"], 1)
 
 
-def parse_last_vowel(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+def parse_last_vowel(word: list[list[str]]) -> list[list[str]]:
     '''
     Parse last vowel from word variations
     '''
-    parse_success, result_long = parse_endings(word, vowels_long + vowels_high_long)
+    result_long = parse_endings(word, VOWELS["long_high"] + VOWELS["long_low"], 1)
           
     # if long vowel is parsed, return without trying to parse short vowel
-    if parse_success:
-       return parse_success, result_long
+    if len(result_long) > 0:
+       return result_long
 
     # otherwise parse short vowel
-    return parse_endings(word, vowels + vowels_high)
+    return parse_endings(word, VOWELS["short_high"] + VOWELS["short_low"], 1)
 
 
-def parse_last_syllable(word: list[list[str]]) -> tuple[bool, list[list[str]]]:
+def parse_last_syllable(word: list[list[str]]) -> list[list[str]]:
     '''
     Try to parse a consonant from the end of the word: CVC, CVVC, CV, or CVV
     '''
-    # parse last consonant if it exists
-    parse_end_con_success, parsed_end_con = parse_last_consonant(word)
+    # try to parse last consonant which may not exist
+    end_result = parse_last_consonant(word)
 
-    # parse vowel depending on whether consonant was parsed or not
-    if parse_end_con_success:
-        parse_vowel_success, parsed_vowel = parse_last_vowel(parsed_end_con)        
+    # parse last vowel
+    if end_result:
+        mid_result = parse_last_vowel(end_result)
     else:
-        parse_vowel_success, parsed_vowel = parse_last_vowel(word)
+        mid_result = []
+    mid_result.extend(parse_last_vowel(word))
 
-    # if vowel wasn't parsed, invalid
-    if not parse_vowel_success:
-        return False, []
+    # if vowel parsing fails, then last syllable is invalid
+    if not mid_result:
+        return []
     
-    # if vowel successfully parsed, continue with parsing first consonant
-    return parse_last_consonant(parsed_vowel)
+    # otherwise, parse first consonant which must exist
+    start_result = parse_last_consonant(mid_result)
+
+    return start_result
 
 
-# def parse_word(word: list[list[str]]) -> list[list[str]]:
-#     parse_suffix()
+def parse_word(word: str) -> list[list[str]]:
+    normalized = [[normalize_str(word), "", ""]]
+
+    # try to parse with suffix
+    with_suffix = parse_suffix(normalized)
+
+    if with_suffix:
+        with_root = parse_last_syllable(with_suffix)
+    else:
+        with_root = []
+    with_root.extend(parse_last_syllable(normalized))
+    
+    return with_root
 
 
 # TESTING
 if __name__ == "__main__":
     test_verbs, test_roots = extract_test_data("test_data_swanton.csv")
-
-    for verb in test_verbs[:10]:
-        print(verb)
-        verbnorm = [[normalize_str(verb)]]
-        print(verbnorm)
-        parse_suf = parse_suffix(verbnorm)
-        parse_suf[1].extend(verbnorm)
-        print(">>>>", parse_suf[1])
-        parse_syl = parse_last_syllable(parse_suf[1])
-        print(">>>>", parse_syl[1])
+    for i in range(len(test_verbs)):
+        verb = test_verbs[i]
+        result = parse_word(verb)
+        print("verb:", print(verb))
+        print("options:", end="")
+        print_word(result)
+        print("verb root options:", end="")
+        print_word_roots(result)
+        print("actual:", test_roots[i])
         print("---------------")

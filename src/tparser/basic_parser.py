@@ -188,7 +188,7 @@ if __name__ == "__main__":
     for i in range(len(test_verbs)):
         verb = test_verbs[i]
         result = parse_word(verb)
-        print("verb:", print(verb))
+        print("verb:", verb)
         print("options:", end="")
         print_word(result)
         print("verb root options:", end="")

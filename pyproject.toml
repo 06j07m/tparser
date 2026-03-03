@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tparser"
+version = "0.2.0"
+authors = [
+    {name="Mona Liu", email="monaliu832@gmail.com"},
+]
+description = "rule based tlingit verb parser"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]

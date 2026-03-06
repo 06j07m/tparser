@@ -3,7 +3,7 @@ import unicodedata as ucd
 import importlib.resources as rsrc
 import json
 
-from verb import Verb
+from .verb import Verb
 
 class Parser:
     """
@@ -187,9 +187,9 @@ class Parser:
 
         # displaying the possibilities
         print("verb:", verb)
-        print("options:", end="")
+        print("options:", end=" ")
         print(", ".join(parsed_str))
-        print("verb root options:", end="")
+        print("verb root options:", end=" ")
         print(", ".join(parsed_roots))
 
         return parsed_result

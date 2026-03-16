@@ -10,10 +10,6 @@ class Parser:
     Parser for verbs
     """
 
-    _PREFIX = 0
-    _STEM = 1
-    _SUFFIX = 2
-
     def __init__(self):
         # initialize data
         self._ALPHABET = self._load_json("alphabet.json")
@@ -127,6 +123,9 @@ class Parser:
         for suf in self._SUFFIXES["clause"]:
             parsed = self._parse_suffix(word, suf)
             parsed_variations.extend(parsed)
+        for suf in self._SUFFIXES["tense"]:
+            parsed = self._parse_suffix(word, suf)
+            parsed_variations.extend(parsed)
         return parsed_variations
 
 
@@ -173,7 +172,7 @@ class Parser:
             parsed_vowel.extend(self._parse_last_vowel(variation))
         parsed_vowel.extend(self._parse_last_vowel(word))
         if not parsed_vowel:
-            return parsed_syllable
+            return []
 
         # try to parse first consonant
         parsed_syllable = []

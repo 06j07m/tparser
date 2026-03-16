@@ -111,7 +111,7 @@ class Parser:
             parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
             # indicate in the new word if it's a CV-root suffix
             # or a CVC-root suffix
-            parsed.root_form = suffix["form"]
+            parsed.meta["root_form"] = suffix["form"]
 
             # add to list of possible results if successful
             parsed_variations.append(parsed)
@@ -223,9 +223,9 @@ class Parser:
         if parsed_suffix:
             for variation in parsed_suffix:
                 # depending on whether suffix attaches to CV or CVC root
-                if variation.root_form == "cvc":
+                if variation.meta["root_form"] == "cvc":
                     parsed.extend(self._parse_last_CVC(variation))
-                else:
+                elif variation.meta["root_form"] == "cv":
                     parsed.extend(self._parse_last_CV(variation))
         # parse last syllable WITHOUT parsing suffix
         parsed.extend(self._parse_last_CVC(verb))

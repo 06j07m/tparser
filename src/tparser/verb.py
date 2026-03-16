@@ -3,6 +3,7 @@ class Verb:
     Object to represent verbs
     """
 
+
     def __init__(self, prefix_or_full: str, stem: str = "", suffix: str = "", root: str = ""):
         '''
         Create verb from given stem and optional prefix, suffix, root
@@ -12,7 +13,11 @@ class Verb:
         self.stem = stem
         self.suffix = suffix
         self.root = root
-        self.root_form = None
+        # information about the verb (root) like form, tone,
+        # phonetic/orthographic changes, etc.
+        self.meta = {
+            "root_form": None
+        }
 
     def __str__(self) -> str:
         '''

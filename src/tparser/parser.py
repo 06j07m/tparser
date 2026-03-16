@@ -17,7 +17,7 @@ class Parser:
     def __init__(self):
         # initialize data
         self._ALPHABET = self._load_json("alphabet.json")
-        self._SUFFIXES = self._load_json("suffixes.json")
+        self._SUFFIXES = self._load_json("suffixes_2.json")
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
 
@@ -54,7 +54,7 @@ class Parser:
         return norm_noaccent
     
 
-    def _parse_ending(self, word: Verb, ending: str, position: int) -> list[Verb]:
+    def _parse_ending(self, word: Verb, ending: str) -> list[Verb]:
         '''
         Try to parse given ending from the right of the word
         '''
@@ -66,12 +66,8 @@ class Parser:
             split_at = len(base) - len(ending)
 
             # make new word
-            if position == self._SUFFIX:
-                new_stem = word.stem
-                new_suffix = ending + word.suffix
-            elif position == self._STEM:
-                new_stem = ending + word.stem
-                new_suffix = word.suffix
+            new_stem = ending + word.stem
+            new_suffix = word.suffix
             new_prefix = base[:split_at]
 
             parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
@@ -82,7 +78,7 @@ class Parser:
         return parsed_variations
 
 
-    def _parse_endings(self, word: Verb, endings: list[str], position: int) -> list[Verb]:
+    def _parse_endings(self, word: Verb, endings: list[str]) -> list[Verb]:
         '''
         Try to parse each ending from the right of the word
         '''
@@ -90,44 +86,76 @@ class Parser:
 
         for ending in endings:
             # try to parse each ending
-            parsed = self._parse_ending(word, ending, position)
+            parsed = self._parse_ending(word, ending)
             parsed_variations.extend(parsed)
     
         return parsed_variations
     
-    def _parse_suffix(self, word: Verb) -> list[Verb]:
+
+    def _parse_suffix(self, word: Verb, suffix: dict[str, str]) -> list[Verb]:
         '''
-        Try to parse suffix
+        Try to parse given suffix from the right of the word
         '''
-        return self._parse_endings(word, self._SUFFIXES["suffixes"], self._SUFFIX)
+        parsed_variations = []
+        base = word.prefix
+        
+        if base.endswith(suffix["suffix"]):
+            # split it right before the ending
+            split_at = len(base) - len(suffix["suffix"])
+
+            # make new word
+            new_stem = word.stem
+            new_suffix = suffix["suffix"] + word.suffix
+            new_prefix = base[:split_at]
+            
+            parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
+            # indicate in the new word if it's a CV-root suffix
+            # or a CVC-root suffix
+            parsed.root_form = suffix["form"]
+
+            # add to list of possible results if successful
+            parsed_variations.append(parsed)
+                
+        return parsed_variations
+    
+
+    def _parse_suffixes(self, word: Verb) -> list[Verb]:
+        '''
+        Try to parse all suffixes from the end of the word
+        '''
+        parsed_variations = []
+        for suf in self._SUFFIXES["clause"]:
+            parsed = self._parse_suffix(word, suf)
+            parsed_variations.extend(parsed)
+        return parsed_variations
 
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:
         '''
         Try to parse rightmost consonant
         '''
-        result_mult = self._parse_endings(word, self._CONSONANTS["multiple"], self._STEM)
+        result_mult = self._parse_endings(word, self._CONSONANTS["multiple"])
             
         # if multi-letter consonant is parsed, return without trying to parse one letter
         if len(result_mult) > 0:
             return result_mult
 
         # otherwise parse one letter only
-        return self._parse_endings(word, self._CONSONANTS["single"], self._STEM)
+        return self._parse_endings(word, self._CONSONANTS["single"])
 
 
     def _parse_last_vowel(self, word: Verb) -> list[Verb]:
         '''
         Try to parse rightmost vowel
         '''
-        result_long = self._parse_endings(word, self._VOWELS["long_high"] + self._VOWELS["long_low"], self._STEM)
+        result_long = self._parse_endings(word, self._VOWELS["long_high"] + self._VOWELS["long_low"])
             
         # if long vowel is parsed, return without trying to parse short vowel
         if len(result_long) > 0:
             return result_long
 
         # otherwise parse short vowel
-        return self._parse_endings(word, self._VOWELS["short_high"] + self._VOWELS["short_low"], self._STEM)
+        return self._parse_endings(word, self._VOWELS["short_high"] + self._VOWELS["short_low"])
 
 
     def _parse_last_CVC(self, word: Verb) -> list[Verb]:
@@ -162,7 +190,7 @@ class Parser:
         # try to parse last vowel
         parsed_vowel = self._parse_last_vowel(word)
         if not parsed_vowel:
-            return parsed_syllable
+            return []
 
         # try to parse first consonant
         parsed_syllable = []
@@ -170,6 +198,7 @@ class Parser:
             parsed_syllable.extend(self._parse_last_consonant(variation))
 
         return parsed_syllable
+
 
     def parse_word(self, word: str, no_display: bool = False) -> list[tuple[str]]:
         '''
@@ -186,15 +215,21 @@ class Parser:
         normalized = self._normalize_word(word)
         verb = Verb(normalized)
 
-        # try to parse with suffix
-        parsed_suffix = self._parse_suffix(verb)
+        # try to parse suffixes
+        parsed_suffix = self._parse_suffixes(verb)
 
-        # parse last syllable (with and without suffix)
+        # parse last syllable with suffix
         parsed = []
         if parsed_suffix:
             for variation in parsed_suffix:
-                parsed.extend(self._parse_last_CVC(variation))
+                # depending on whether suffix attaches to CV or CVC root
+                if variation.root_form == "cvc":
+                    parsed.extend(self._parse_last_CVC(variation))
+                else:
+                    parsed.extend(self._parse_last_CV(variation))
+        # parse last syllable WITHOUT parsing suffix
         parsed.extend(self._parse_last_CVC(verb))
+        parsed.extend(self._parse_last_CV(verb))
 
         # convert to friendly representation
         parsed_str = [p.to_string() for p in parsed]

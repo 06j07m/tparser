@@ -1,0 +1,30 @@
+{
+    "clause": [
+        {"suffix": "a", "form": "cvc"},
+        {"suffix": "a\u0301", "form": "cvc"},
+        {"suffix": "aa", "form": "cvc"},
+        {"suffix": "a\u0301a", "form": "cvc"},
+        {"suffix": "ee", "form": "cvc"},
+        {"suffix": "e\u0301e", "form": "cvc"},
+        {"suffix": "ei", "form": "cvc"},
+        {"suffix": "e\u0301i", "form": "cvc"},
+        {"suffix": "u", "form": "cvc"},
+        {"suffix": "u\u0301", "form": "cvc"},
+        {"suffix": "ya", "form": "cv"},
+        {"suffix": "wa", "form": "cv"},
+        {"suffix": "ya\u0301", "form": "cv"},
+        {"suffix": "wa\u0301", "form": "cv"},
+        {"suffix": "yaa", "form": "cv"},
+        {"suffix": "waa", "form": "cv"},
+        {"suffix": "ya\u0301a", "form": "cv"},
+        {"suffix": "wa\u0301a", "form": "cv"},
+        {"suffix": "yi", "form": "cv"},
+        {"suffix": "yi\u0301", "form": "cv"},
+        {"suffix": "yee", "form": "cv"},
+        {"suffix": "ye\u0301e", "form": "cv"},
+        {"suffix": "yei", "form": "cv"},
+        {"suffix": "ye\u0301i", "form": "cv"},
+        {"suffix": "wu", "form": "cv"},
+        {"suffix": "wu\u0301", "form": "cv"}
+    ]
+}

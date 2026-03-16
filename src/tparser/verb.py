@@ -12,6 +12,7 @@ class Verb:
         self.stem = stem
         self.suffix = suffix
         self.root = root
+        self.root_form = None
 
     def __str__(self) -> str:
         '''

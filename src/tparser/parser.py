@@ -114,6 +114,7 @@ class Parser:
         parsed_variations = []
         
         parsed_variations.extend(self._parse_suffix(word, self._SUFFIXES["clause"]))
+        parsed_variations
         
         parsed_variations.extend(self._parse_suffix(word, self._SUFFIXES["tense"]))
         
@@ -153,24 +154,24 @@ class Parser:
         Try to parse a CVC, CVVC consonant from the end of the word
         '''
         # try to parse last consonant
-        parsed_last_cons = self._parse_last_consonant(word)
-        if not parsed_last_cons:
+        result_last_cons = self._parse_last_consonant(word)
+        if not result_last_cons:
             return []
 
         # try to parse last vowel
-        parsed_vowel = []
-        for variation in parsed_last_cons:
-            parsed_vowel.extend(self._parse_last_vowel(variation))
-        parsed_vowel.extend(self._parse_last_vowel(word))
-        if not parsed_vowel:
+        result_vowel = []
+        for variation in result_last_cons:
+            result_vowel.extend(self._parse_last_vowel(variation))
+        result_vowel.extend(self._parse_last_vowel(word))
+        if not result_vowel:
             return []
 
         # try to parse first consonant
-        parsed_syllable = []
-        for variation in parsed_vowel:
-            parsed_syllable.extend(self._parse_last_consonant(variation))
+        result_syllable = []
+        for variation in result_vowel:
+            result_syllable.extend(self._parse_last_consonant(variation))
 
-        return parsed_syllable
+        return result_syllable
 
 
     def _parse_last_CV(self, word: Verb) -> list[Verb]:
@@ -178,16 +179,16 @@ class Parser:
         Try to parse a CV, CVV consonant from the end of the word
         '''
         # try to parse last vowel
-        parsed_vowel = self._parse_last_vowel(word)
-        if not parsed_vowel:
+        result_vowel = self._parse_last_vowel(word)
+        if not result_vowel:
             return []
 
         # try to parse first consonant
-        parsed_syllable = []
-        for variation in parsed_vowel:
-            parsed_syllable.extend(self._parse_last_consonant(variation))
+        result_syllable = []
+        for variation in result_vowel:
+            result_syllable.extend(self._parse_last_consonant(variation))
 
-        return parsed_syllable
+        return result_syllable
 
 
     def parse_word(self, word: str, no_display: bool = False) -> list[tuple[str]]:
@@ -206,12 +207,12 @@ class Parser:
         verb = Verb(normalized)
 
         # try to parse suffixes
-        parsed_suffix = self._parse_suffixes(verb)
+        result_suffix = self._parse_suffixes(verb)
 
         # parse last syllable with suffix
         parsed = []
-        if parsed_suffix:
-            for variation in parsed_suffix:
+        if result_suffix:
+            for variation in result_suffix:
                 # depending on whether suffix attaches to CV or CVC root
                 if variation.meta["root_form"] == "cvc":
                     parsed.extend(self._parse_last_CVC(variation))

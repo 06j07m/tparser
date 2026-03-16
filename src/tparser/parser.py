@@ -111,14 +111,14 @@ class Parser:
         '''
         Try to parse all possible suffix combinations
         '''
-        parsed_variations = []
+        result_clause = self._parse_suffix(word, self._SUFFIXES["clause"])
         
-        parsed_variations.extend(self._parse_suffix(word, self._SUFFIXES["clause"]))
-        parsed_variations
+        result_tense = []
+        for variation in result_clause:
+            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["tense"]))
+        result_tense.extend(self._parse_suffix(word, self._SUFFIXES["tense"]))
         
-        parsed_variations.extend(self._parse_suffix(word, self._SUFFIXES["tense"]))
-        
-        return parsed_variations
+        return result_tense
 
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:

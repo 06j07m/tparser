@@ -130,30 +130,46 @@ class Parser:
         return self._parse_endings(word, self._VOWELS["short_high"] + self._VOWELS["short_low"], self._STEM)
 
 
-    def _parse_last_syllable(self, word: Verb) -> list[Verb]:
+    def _parse_last_CVC(self, word: Verb) -> list[Verb]:
         '''
-        Try to parse a consonant from the end of the word: CVC, CVVC, CV, or CVV
+        Try to parse a CVC, CVVC consonant from the end of the word
         '''
-        # try to parse last consonant which may not exist
+        # try to parse last consonant
         parsed_last_cons = self._parse_last_consonant(word)
+        if not parsed_last_cons:
+            return []
 
-        # parse last vowel
+        # try to parse last vowel
         parsed_vowel = []
-        if parsed_last_cons:
-            for variation in parsed_last_cons:
-                parsed_vowel.extend(self._parse_last_vowel(variation))
+        for variation in parsed_last_cons:
+            parsed_vowel.extend(self._parse_last_vowel(variation))
         parsed_vowel.extend(self._parse_last_vowel(word))
-
-        parsed_syllable = []
-        # if vowel parsing fails, then last syllable is invalid so directly return
         if not parsed_vowel:
             return parsed_syllable
-        # otherwise, parse first consonant which must exist
+
+        # try to parse first consonant
+        parsed_syllable = []
         for variation in parsed_vowel:
             parsed_syllable.extend(self._parse_last_consonant(variation))
 
         return parsed_syllable
 
+
+    def _parse_last_CV(self, word: Verb) -> list[Verb]:
+        '''
+        Try to parse a CV, CVV consonant from the end of the word
+        '''
+        # try to parse last vowel
+        parsed_vowel = self._parse_last_vowel(word)
+        if not parsed_vowel:
+            return parsed_syllable
+
+        # try to parse first consonant
+        parsed_syllable = []
+        for variation in parsed_vowel:
+            parsed_syllable.extend(self._parse_last_consonant(variation))
+
+        return parsed_syllable
 
     def parse_word(self, word: str, no_display: bool = False) -> list[tuple[str]]:
         '''
@@ -177,8 +193,8 @@ class Parser:
         parsed = []
         if parsed_suffix:
             for variation in parsed_suffix:
-                parsed.extend(self._parse_last_syllable(variation))
-        parsed.extend(self._parse_last_syllable(verb))
+                parsed.extend(self._parse_last_CVC(variation))
+        parsed.extend(self._parse_last_CVC(verb))
 
         # convert to friendly representation
         parsed_str = [p.to_string() for p in parsed]

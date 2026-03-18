@@ -97,8 +97,9 @@ class Parser:
                 
                 parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
                 # indicate in the new word if it's a CV-root suffix
-                # or a CVC-root suffix
-                parsed.meta["root_form"] = suffix["form"]
+                # or a CVC-root suffix (if it matters for the suffix)
+                if suffix["form"] != "":
+                    parsed.meta["root_form"] = suffix["form"]
 
                 # add to list of possible results if successful
                 parsed_variations.append(parsed)
@@ -109,16 +110,11 @@ class Parser:
 
     def _parse_suffixes(self, word: Verb) -> list[Verb]:
         '''
-        Try to parse all possible suffix combinations
+        Try to parse all possible suffixes (only one suffix though)
         '''
-        result_clause = self._parse_suffix(word, self._SUFFIXES["clause"])
+        result = self._parse_suffix(word, self._SUFFIXES["all"])
         
-        result_tense = []
-        for variation in result_clause:
-            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["tense"]))
-        result_tense.extend(self._parse_suffix(word, self._SUFFIXES["tense"]))
-        
-        return result_tense
+        return result
 
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:
@@ -227,11 +223,12 @@ class Parser:
         parsed_roots = [p.stem for p in parsed]
         parsed_result = [p.to_tuple_stem() for p in parsed]
 
-        # displaying the possibilities
-        print("verb:", verb)
-        print("options:", end=" ")
-        print(", ".join(parsed_str))
-        print("verb root options:", end=" ")
-        print(", ".join(parsed_roots))
+        if not no_display:
+            # displaying the possibilities
+            print("verb:", verb)
+            print("options:", end=" ")
+            print(", ".join(parsed_str))
+            print("verb root options:", end=" ")
+            print(", ".join(parsed_roots))
 
         return parsed_result

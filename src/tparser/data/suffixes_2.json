@@ -1,5 +1,5 @@
 {
-    "clause": [
+    "all": [
         {"suffix": "a", "form": "cvc"},
         {"suffix": "a\u0301", "form": "cvc"},
         {"suffix": "aa", "form": "cvc"},
@@ -25,9 +25,7 @@
         {"suffix": "yei", "form": "cv"},
         {"suffix": "ye\u0301i", "form": "cv"},
         {"suffix": "wu", "form": "cv"},
-        {"suffix": "wu\u0301", "form": "cv"}
-    ],
-    "tense": [
+        {"suffix": "wu\u0301", "form": "cv"},
         {"suffix": "in", "form": "cvc"},
         {"suffix": "i\u0301n", "form": "cvc"},
         {"suffix": "un", "form": "cvc"},
@@ -35,6 +33,10 @@
         {"suffix": "yin", "form": "cv"},
         {"suffix": "yi\u0301n", "form": "cv"},
         {"suffix": "wun", "form": "cv"},
-        {"suffix": "wu\u0301n", "form": "cv"}
+        {"suffix": "wu\u0301n", "form": "cv"},
+        {"suffix": "ni\u0301", "form": ""},
+        {"suffix": "n", "form": "cv", "ablaut": "true"},
+        {"suffix": "y", "form": "cv"},
+        {"suffix": "w", "form": "cv"}
     ]
 }

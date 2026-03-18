@@ -16,7 +16,7 @@ class Verb:
         # information about the verb (root) like form, tone,
         # phonetic/orthographic changes, etc.
         self.meta = {
-            "root_form": None
+            "root_form": ""
         }
 
     def __str__(self) -> str:

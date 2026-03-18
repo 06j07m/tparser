@@ -46,15 +46,14 @@
         {"suffix": "ch", "form": "", "ablaut": "true"},
         {"suffix": "k", "form": "", "ablaut": "true"},
         {"suffix": "kw", "form": "", "ablaut": "true"},
-        {"suffix": "kt", "form": "", "ablaut": "true"},
-        {"suffix": "kwt", "form": "", "ablaut": "true"},
         {"suffix": "l\u02bc", "form": "", "ablaut": "true"},
         {"suffix": "s\u02bc", "form": "", "ablaut": "true"},
         {"suffix": "t", "form": "", "ablaut": "true"},
         {"suffix": "t\u02bc", "form": "", "ablaut": "true"},
-        {"suffix": "x\u02bc", "form": "", "ablaut": "true"},
-        {"suffix": "x\u02bcw", "form": "", "ablaut": "true"},
-        {"suffix": "x\u0331", "form": "", "ablaut": "true"},
-        {"suffix": "x\u0331w", "form": "", "ablaut": "true"}
+        {"suffix": "kt", "form": "", "ablaut": "true"},
+        {"suffix": "kwt", "form": "", "ablaut": "true"},
+        {"suffix": "x\u0331wx\u02bc", "form": "", "ablaut": "true"},
+        {"suffix": "x\u0331x\u02bc", "form": "", "ablaut": "true"},
+        {"suffix": "x\u0331x\u02bcw", "form": "", "ablaut": "true"}
     ]
 }

@@ -13,7 +13,7 @@ class Parser:
     def __init__(self):
         # initialize data
         self._ALPHABET = self._load_json("alphabet.json")
-        self._SUFFIXES = self._load_json("suffixes_2.json")
+        self._SUFFIXES = self._load_json("suffixes.json")
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
 

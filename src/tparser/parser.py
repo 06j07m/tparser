@@ -112,9 +112,15 @@ class Parser:
         '''
         Try to parse all possible suffixes (only one suffix though)
         '''
-        result = self._parse_suffix(word, self._SUFFIXES["all"])
+        # suffixes that do not add a syllable
+        result1 = self._parse_suffix(word, self._SUFFIXES["no_syllable"])
+
+        # suffixes that add a syllable
+        result2 = self._parse_suffix(word, self._SUFFIXES["syllable"])
+        for variation in result1:
+            result2.extend(self._parse_suffix(variation, self._SUFFIXES["syllable"]))
         
-        return result
+        return result1 + result2
 
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:
@@ -213,6 +219,9 @@ class Parser:
                 if variation.meta["root_form"] == "cvc":
                     parsed.extend(self._parse_last_CVC(variation))
                 elif variation.meta["root_form"] == "cv":
+                    parsed.extend(self._parse_last_CV(variation))
+                else:
+                    parsed.extend(self._parse_last_CVC(variation))
                     parsed.extend(self._parse_last_CV(variation))
         # parse last syllable WITHOUT parsing suffix
         parsed.extend(self._parse_last_CVC(verb))

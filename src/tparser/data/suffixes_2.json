@@ -1,5 +1,5 @@
 {
-    "all": [
+    "syllable": [
         {"suffix": "a", "form": "cvc"},
         {"suffix": "a\u0301", "form": "cvc"},
         {"suffix": "aa", "form": "cvc"},
@@ -35,8 +35,28 @@
         {"suffix": "wun", "form": "cv"},
         {"suffix": "wu\u0301n", "form": "cv"},
         {"suffix": "ni\u0301", "form": ""},
+        {"suffix": "ch\u02bcan", "form": ""},
+        {"suffix": "shan", "form": ""}
+    ],
+    "no_syllable": [
         {"suffix": "n", "form": "cv", "ablaut": "true"},
         {"suffix": "y", "form": "cv"},
-        {"suffix": "w", "form": "cv"}
+        {"suffix": "w", "form": "cv"},
+        {"suffix": "ch", "form": "", "ablaut": "true"},
+        {"suffix": "k", "form": "", "ablaut": "true"},
+        {"suffix": "kw", "form": "", "ablaut": "true"},
+        {"suffix": "kt", "form": "", "ablaut": "true"},
+        {"suffix": "kwt", "form": "", "ablaut": "true"},
+        {"suffix": "l\u02bc", "form": "", "ablaut": "true"},
+        {"suffix": "s\u02bc", "form": "", "ablaut": "true"},
+        {"suffix": "t", "form": "", "ablaut": "true"},
+        {"suffix": "t\u02bc", "form": "", "ablaut": "true"},
+        {"suffix": "x\u02bc", "form": "", "ablaut": "true"},
+        {"suffix": "x\u02bcw", "form": "", "ablaut": "true"},
+        {"suffix": "x\u0331", "form": "", "ablaut": "true"},
+        {"suffix": "x\u0331w", "form": "", "ablaut": "true"},
+        {"suffix": "", "form": "", "ablaut": "true"},
+        {"suffix": "", "form": "", "ablaut": "true"},
+        {"suffix": "", "form": "", "ablaut": "true"},
     ]
 }

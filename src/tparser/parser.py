@@ -112,15 +112,21 @@ class Parser:
         '''
         Try to parse all possible suffixes (only one suffix though)
         '''
-        # suffixes that do not add a syllable
-        result1 = self._parse_suffix(word, self._SUFFIXES["no_syllable"])
+        result_clause = self._parse_suffix(word, self._SUFFIXES["clause"])
 
-        # suffixes that add a syllable
-        result2 = self._parse_suffix(word, self._SUFFIXES["syllable"])
-        for variation in result1:
-            result2.extend(self._parse_suffix(variation, self._SUFFIXES["syllable"]))
-        
-        return result1 + result2
+        result_tense = self._parse_suffix(word, self._SUFFIXES["tense"])
+        for variation in result_clause:
+            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["tense"]))
+
+        result_mod = self._parse_suffix(word, self._SUFFIXES["modality"])
+        for variation in result_clause:
+            result_mod.extend(self._parse_suffix(variation, self._SUFFIXES["modality"]))
+
+        result_rep = self._parse_suffix(word, self._SUFFIXES["repetitive"])
+        for variation in result_clause:
+            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["repetitive"]))
+
+        return result_clause + result_tense + result_mod + result_rep
 
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:

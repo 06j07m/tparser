@@ -38,20 +38,20 @@
         {"suffix": "wu\u0301n", "form": "cv", "ablaut": false}
     ],
     "modality": [
-        {"suffix": "k\u0331", "form": "cv", "ablaut": false},
         {"suffix": "ik\u0331", "form": "cvc", "ablaut": false},
-        {"suffix": "i\u0301k\u0331", "form": "cvc", "ablaut": false},
-        {"suffix": "uk\u0331", "form": "cvc", "ablaut": false},
-        {"suffix": "u\u0301k\u0331", "form": "cvc", "ablaut": false},
-        {"suffix": "ak\u0331", "form": "cvc", "ablaut": false},
-        {"suffix": "a\u0301k\u0331", "form": "cvc", "ablaut": false},
-        {"suffix": "k\u0331w", "form": "cv", "ablaut": false},
         {"suffix": "ik\u0331w", "form": "cvc", "ablaut": false},
+        {"suffix": "i\u0301k\u0331", "form": "cvc", "ablaut": false},
         {"suffix": "i\u0301k\u0331w", "form": "cvc", "ablaut": false},
+        {"suffix": "uk\u0331", "form": "cvc", "ablaut": false},
         {"suffix": "uk\u0331w", "form": "cvc", "ablaut": false},
+        {"suffix": "u\u0301k\u0331", "form": "cvc", "ablaut": false},
         {"suffix": "u\u0301k\u0331w", "form": "cvc", "ablaut": false},
+        {"suffix": "ak\u0331", "form": "cvc", "ablaut": false},
         {"suffix": "ak\u0331w", "form": "cvc", "ablaut": false},
+        {"suffix": "a\u0301k\u0331", "form": "cvc", "ablaut": false},
         {"suffix": "a\u0301k\u0331w", "form": "cvc", "ablaut": false},
+        {"suffix": "k\u0331", "form": "cv", "ablaut": false},
+        {"suffix": "k\u0331w", "form": "cv", "ablaut": false},
         {"suffix": "ni\u0301", "form": "", "ablaut": false},
         {"suffix": "n", "form": "cv", "ablaut": true},
         {"suffix": "y", "form": "cv", "ablaut": false},
@@ -60,7 +60,8 @@
     ],
     "repetitive": [
         {"suffix": "ch", "form": "", "ablaut": true},
-        {"suffix": "ch\u02bc", "form": "cv", "ablaut": true},
+        {"suffix": "ch\u02bc", "form": "", "ablaut": true, "after_ej": false},
+        {"suffix": "sh", "form": "", "ablaut": true, "after_ej": true},
         {"suffix": "k", "form": "", "ablaut": true},
         {"suffix": "kw", "form": "", "ablaut": true},
         {"suffix": "l\u02bc", "form": "", "ablaut": true},
@@ -72,7 +73,9 @@
         {"suffix": "x\u0331wx\u02bc", "form": "", "ablaut": true},
         {"suffix": "x\u0331x\u02bc", "form": "", "ablaut": true},
         {"suffix": "x\u0331x\u02bcw", "form": "", "ablaut": true},
-        {"suffix": "ch\u02bcan", "form": "", "ablaut": false},
-        {"suffix": "sha\u0301n", "form": "", "ablaut": false}
+        {"suffix": "a\u0301ch\u02bc", "form": "cvc", "ablaut": true},
+        {"suffix": "a\u0301l\u02bc", "form": "cvc", "ablaut": true},
+        {"suffix": "a\u0301s\u02bc", "form": "cvc", "ablaut": true},
+        {"suffix": "ch\u02bca\u0301l\u02bc", "form": "cv", "ablaut": true}
     ]
 }

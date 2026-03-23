@@ -119,18 +119,18 @@ class Parser:
             result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["tense"]))
 
         result_mod = self._parse_suffix(word, self._SUFFIXES["modality"])
-        for variation in result_clause:
+        for variation in result_tense:
             result_mod.extend(self._parse_suffix(variation, self._SUFFIXES["modality"]))
 
         result_rep = self._parse_suffix(word, self._SUFFIXES["repetitive"])
-        for variation in result_clause:
-            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["repetitive"]))
+        for variation in result_mod:
+            result_rep.extend(self._parse_suffix(variation, self._SUFFIXES["repetitive"]))
 
         result_misc = self._parse_suffix(word, self._SUFFIXES["misc"])
-        for variation in result_clause:
-            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["misc"]))
+        for variation in result_rep:
+            result_misc.extend(self._parse_suffix(variation, self._SUFFIXES["misc"]))
 
-        return result_clause + result_tense + result_mod + result_rep
+        return result_clause + result_tense + result_mod + result_rep + result_misc
 
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:

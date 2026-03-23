@@ -19,8 +19,8 @@ if __name__ == "__main__":
     test_verbs, test_roots = extract_test_data("tests/test_data_swanton.csv")
     parser = Parser()
     
-    for i in range(20):
+    for i in range(len(test_verbs)):
         verb = test_verbs[i]
         result = parser.parse_word(verb)
         print("actual:", test_roots[i])
-        print("---------------")
+        input("--press enter for next--")

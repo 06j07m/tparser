@@ -4,6 +4,8 @@
         {"suffix": "a\u0301", "form": "cvc", "ablaut": false},
         {"suffix": "aa", "form": "cvc", "ablaut": false},
         {"suffix": "a\u0301a", "form": "cvc", "ablaut": false},
+        {"suffix": "i", "form": "cvc", "ablaut": false},
+        {"suffix": "i\u0301", "form": "cvc", "ablaut": false},
         {"suffix": "ee", "form": "cvc", "ablaut": false},
         {"suffix": "e\u0301e", "form": "cvc", "ablaut": false},
         {"suffix": "ei", "form": "cvc", "ablaut": false},
@@ -35,7 +37,13 @@
         {"suffix": "yin", "form": "cv", "ablaut": false},
         {"suffix": "yi\u0301n", "form": "cv", "ablaut": false},
         {"suffix": "wun", "form": "cv", "ablaut": false},
-        {"suffix": "wu\u0301n", "form": "cv", "ablaut": false}
+        {"suffix": "wu\u0301n", "form": "cv", "ablaut": false},
+        {"suffix": "an", "form": "cvc", "ablaut": false},
+        {"suffix": "a\u0301n", "form": "cvc", "ablaut": false},
+        {"suffix": "yan", "form": "cv", "ablaut": false},
+        {"suffix": "ya\u0301n", "form": "cv", "ablaut": false},
+        {"suffix": "wan", "form": "cv", "ablaut": false},
+        {"suffix": "wa\u0301n", "form": "cv", "ablaut": false}
     ],
     "modality": [
         {"suffix": "ik\u0331", "form": "cvc", "ablaut": false},
@@ -52,19 +60,16 @@
         {"suffix": "a\u0301k\u0331w", "form": "cvc", "ablaut": false},
         {"suffix": "k\u0331", "form": "cv", "ablaut": false},
         {"suffix": "k\u0331w", "form": "cv", "ablaut": false},
-        {"suffix": "ni\u0301", "form": "", "ablaut": false},
-        {"suffix": "n", "form": "cv", "ablaut": true},
-        {"suffix": "y", "form": "cv", "ablaut": false},
-        {"suffix": "y\u0308", "form": "cv", "ablaut": false},
-        {"suffix": "w", "form": "cv", "ablaut": false}
+        {"suffix": "k\u02bc", "form": "", "ablaut": false},
+        {"suffix": "ni\u0301", "form": "", "ablaut": false}
     ],
     "repetitive": [
-        {"suffix": "ch", "form": "", "ablaut": true},
-        {"suffix": "ch\u02bc", "form": "", "ablaut": true, "after_ej": false},
-        {"suffix": "sh", "form": "", "ablaut": true, "after_ej": true},
+        {"suffix": "ch", "form": "", "ablaut": true, "before_vowel": false},
+        {"suffix": "j", "form": "", "ablaut": true, "before_vowel": true},
         {"suffix": "k", "form": "", "ablaut": true},
         {"suffix": "kw", "form": "", "ablaut": true},
         {"suffix": "l\u02bc", "form": "", "ablaut": true},
+        {"suffix": "s", "form": "", "ablaut": false},
         {"suffix": "s\u02bc", "form": "", "ablaut": true},
         {"suffix": "t", "form": "", "ablaut": true},
         {"suffix": "t\u02bc", "form": "", "ablaut": true},
@@ -73,9 +78,22 @@
         {"suffix": "x\u0331wx\u02bc", "form": "", "ablaut": true},
         {"suffix": "x\u0331x\u02bc", "form": "", "ablaut": true},
         {"suffix": "x\u0331x\u02bcw", "form": "", "ablaut": true},
-        {"suffix": "a\u0301ch\u02bc", "form": "cvc", "ablaut": true},
         {"suffix": "a\u0301l\u02bc", "form": "cvc", "ablaut": true},
+        {"suffix": "a\u0301s", "form": "cvc", "ablaut": false},
         {"suffix": "a\u0301s\u02bc", "form": "cvc", "ablaut": true},
-        {"suffix": "ch\u02bca\u0301l\u02bc", "form": "cv", "ablaut": true}
+        {"suffix": "at", "form": "cvc", "ablaut": true},
+        {"suffix": "at\u02bc", "form": "cvc", "ablaut": true},
+        {"suffix": "l\u02bcu\u0301t\u02bc", "form": "cv", "ablaut": false}
+    ],
+    "misc" : [
+        {"suffix": "n", "form": "cv", "ablaut": true},
+        {"suffix": "y", "form": "cv", "ablaut": false},
+        {"suffix": "y\u0308", "form": "cv", "ablaut": false},
+        {"suffix": "w", "form": "cv", "ablaut": false},
+        {"suffix": "ch\u02bc", "form": "", "ablaut": false, "after_ej": false},
+        {"suffix": "a\u0301ch\u02bc", "form": "cvc", "ablaut": false},
+        {"suffix": "sh", "form": "", "ablaut": false, "after_ej": true},
+        {"suffix": "l", "form": "", "ablaut": false},
+        {"suffix": "ts", "form": "", "ablaut": false}
     ]
 }

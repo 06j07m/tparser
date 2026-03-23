@@ -126,6 +126,10 @@ class Parser:
         for variation in result_clause:
             result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["repetitive"]))
 
+        result_misc = self._parse_suffix(word, self._SUFFIXES["misc"])
+        for variation in result_clause:
+            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["misc"]))
+
         return result_clause + result_tense + result_mod + result_rep
 
 

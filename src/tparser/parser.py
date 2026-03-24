@@ -98,7 +98,7 @@ class Parser:
                 parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
                 # indicate in the new word if it's a CV-root suffix
                 # or a CVC-root suffix (if it matters for the suffix)
-                if suffix["form"] != "":
+                if suffix["form"] in ("cvc_", "cv_"):
                     parsed.meta["root_form"] = suffix["form"]
 
                 # add to list of possible results if successful

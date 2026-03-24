@@ -16,6 +16,12 @@ class Parser:
         self._SUFFIXES = self._load_json("suffixes.json")
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
+        self._VOWEL_MAP = {
+            "ee": "i",
+            "ei": "e",
+            "aa": "a",
+            "oo": "u"
+        }
 
 
     def _load_json(self, filename: str):
@@ -70,6 +76,10 @@ class Parser:
 
                 parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
 
+                # keep root properties
+                parsed.meta["root_form"] = word.meta["root_form"]
+                parsed.meta["ablaut"] = word.meta["ablaut"]
+
                 # add to list of possible results if successful
                 parsed_variations.append(parsed)
             result.extend(parsed_variations)
@@ -100,6 +110,14 @@ class Parser:
                 # or a CVC-root suffix (if it matters for the suffix)
                 if suffix["form"] in ("cvc_", "cv_"):
                     parsed.meta["root_form"] = suffix["form"]
+                else:
+                    parsed.meta["root_form"] = word.meta["root_form"]
+                
+                # indicate whether vowel has been changed
+                if suffix["ablaut"]:
+                    parsed.meta["ablaut"] = True
+                else:
+                    parsed.meta["ablaut"] = word.meta["ablaut"]
 
                 # add to list of possible results if successful
                 parsed_variations.append(parsed)
@@ -201,6 +219,32 @@ class Parser:
             result_syllable.extend(self._parse_last_consonant(variation))
 
         return result_syllable
+    
+
+    def _recover_stem(self, word: Verb) -> list[Verb]:
+        '''
+        Try and recover stem changes in the root from parsed verb 
+        '''
+        stem = word.stem
+        roots = set()
+        
+        # remove high tone
+        stem = stem.replace("\u0301", "")
+
+        # change all long vowels to short vowels
+        for long, short in self._VOWEL_MAP.items():
+            stem = stem.replace(long, short)
+
+        # change vowel back to a or u if ablaut
+        if word.meta["ablaut"]:
+            roots.add(stem.replace("e", "a"))
+            roots.add(stem.replace("e", "u"))
+        else:
+            roots.add(stem)
+
+        results = [Verb(word.prefix, word.stem, word.suffix, r) for r in roots]
+
+        return results
 
 
     def parse_word(self, word: str, no_display: bool = False) -> list[tuple[str]]:
@@ -237,17 +281,21 @@ class Parser:
         parsed.extend(self._parse_last_CVC(verb))
         parsed.extend(self._parse_last_CV(verb))
 
+        final = []
+        for p in parsed:
+            final.extend(self._recover_stem(p))
+
         # convert to friendly representation
-        parsed_str = [p.to_string() for p in parsed]
-        parsed_roots = [p.stem for p in parsed]
-        parsed_result = [p.to_tuple_stem() for p in parsed]
+        verbs = [p.to_string() for p in final]
+        roots = [p.root for p in final]
+        result = [p.to_tuple_root() for p in final]
 
         if not no_display:
             # displaying the possibilities
             print("verb:", verb)
             print("options:", end=" ")
-            print(", ".join(parsed_str))
+            print(", ".join(verbs))
             print("verb root options:", end=" ")
-            print(", ".join(parsed_roots))
+            print(", ".join(roots))
 
-        return parsed_result
+        return result

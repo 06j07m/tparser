@@ -1,9 +1,9 @@
-import pandas as pd
 import unicodedata as ucd
 import importlib.resources as rsrc
 import json
 
 from .verb import Verb
+
 
 class Parser:
     """
@@ -16,26 +16,23 @@ class Parser:
         self._SUFFIXES = self._load_json("suffixes.json")
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
-        self._VOWEL_MAP = {
-            "ee": "i",
-            "ei": "e",
-            "aa": "a",
-            "oo": "u"
-        }
-
+        self._VOWEL_MAP = {"ee": "i", "ei": "e", "aa": "a", "oo": "u"}
 
     def _load_json(self, filename: str):
-        '''
+        """
         Read json from a file in the package
-        '''
-        with rsrc.files("tparser.data").joinpath(filename).open("r", encoding="utf-8") as f:
+        """
+        with (
+            rsrc.files("tparser.data")
+            .joinpath(filename)
+            .open("r", encoding="utf-8") as f
+        ):
             return json.load(f)
-        
 
     def _normalize_word(self, word: str) -> str:
-        '''
+        """
         Return a normalized form of the string
-        '''
+        """
         # strip whitespace
         norm_whitesp = word.strip()
 
@@ -49,17 +46,16 @@ class Parser:
         norm_apostrophe = norm_case.replace("'", "ʼ").replace("’", "ʼ")
 
         # get rid of other accents
-        norm_noaccent = "".join([
-            c for c in norm_apostrophe if c in self._ALPHABET["chars"]
-        ])
+        norm_noaccent = "".join(
+            [c for c in norm_apostrophe if c in self._ALPHABET["chars"]]
+        )
 
         return norm_noaccent
-    
 
     def _parse_ending(self, word: Verb, ending_list: list[str]) -> list[Verb]:
-        '''
+        """
         Try to parse given endings from the right of the word
-        '''
+        """
         result = []
         base = word.prefix
 
@@ -83,17 +79,18 @@ class Parser:
                 # add to list of possible results if successful
                 parsed_variations.append(parsed)
             result.extend(parsed_variations)
-        
-        return result
-    
 
-    def _parse_suffix(self, word: Verb, suffix_list: list[dict[str, str]]) -> list[Verb]:
-        '''
+        return result
+
+    def _parse_suffix(
+        self, word: Verb, suffix_list: list[dict[str, str]]
+    ) -> list[Verb]:
+        """
         Try to parse given suffixes from the right of the word
-        '''
+        """
         result = []
         base = word.prefix
-        
+
         for suffix in suffix_list:
             parsed_variations = []
             if base.endswith(suffix["suffix"]):
@@ -104,7 +101,7 @@ class Parser:
                 new_stem = word.stem
                 new_suffix = suffix["suffix"] + word.suffix
                 new_prefix = base[:split_at]
-                
+
                 parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
                 # indicate in the new word if it's a CV-root suffix
                 # or a CVC-root suffix (if it matters for the suffix)
@@ -112,7 +109,7 @@ class Parser:
                     parsed.meta["root_form"] = suffix["form"]
                 else:
                     parsed.meta["root_form"] = word.meta["root_form"]
-                
+
                 # indicate whether vowel has been changed
                 if suffix["ablaut"]:
                     parsed.meta["ablaut"] = True
@@ -122,14 +119,13 @@ class Parser:
                 # add to list of possible results if successful
                 parsed_variations.append(parsed)
             result.extend(parsed_variations)
-                
+
         return result
-    
 
     def _parse_suffixes(self, word: Verb) -> list[Verb]:
-        '''
+        """
         Try to parse all possible suffixes (only one suffix though)
-        '''
+        """
         result_clause = self._parse_suffix(word, self._SUFFIXES["clause"])
 
         result_tense = self._parse_suffix(word, self._SUFFIXES["tense"])
@@ -142,7 +138,9 @@ class Parser:
 
         result_rep = self._parse_suffix(word, self._SUFFIXES["repetitive"])
         for variation in result_mod:
-            result_rep.extend(self._parse_suffix(variation, self._SUFFIXES["repetitive"]))
+            result_rep.extend(
+                self._parse_suffix(variation, self._SUFFIXES["repetitive"])
+            )
 
         result_misc = self._parse_suffix(word, self._SUFFIXES["misc"])
         for variation in result_rep:
@@ -150,13 +148,12 @@ class Parser:
 
         return result_clause + result_tense + result_mod + result_rep + result_misc
 
-
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:
-        '''
+        """
         Try to parse rightmost consonant
-        '''
+        """
         result_mult = self._parse_ending(word, self._CONSONANTS["multiple"])
-            
+
         # if multi-letter consonant is parsed, return without trying to parse one letter
         if len(result_mult) > 0:
             return result_mult
@@ -164,25 +161,27 @@ class Parser:
         # otherwise parse one letter only
         return self._parse_ending(word, self._CONSONANTS["single"])
 
-
     def _parse_last_vowel(self, word: Verb) -> list[Verb]:
-        '''
+        """
         Try to parse rightmost vowel
-        '''
-        result_long = self._parse_ending(word, self._VOWELS["long_high"] + self._VOWELS["long_low"])
-            
+        """
+        result_long = self._parse_ending(
+            word, self._VOWELS["long_high"] + self._VOWELS["long_low"]
+        )
+
         # if long vowel is parsed, return without trying to parse short vowel
         if len(result_long) > 0:
             return result_long
 
         # otherwise parse short vowel
-        return self._parse_ending(word, self._VOWELS["short_high"] + self._VOWELS["short_low"])
-
+        return self._parse_ending(
+            word, self._VOWELS["short_high"] + self._VOWELS["short_low"]
+        )
 
     def _parse_last_CVC(self, word: Verb) -> list[Verb]:
-        '''
+        """
         Try to parse a CVC, CVVC consonant from the end of the word
-        '''
+        """
         # try to parse last consonant
         result_last_cons = self._parse_last_consonant(word)
         if not result_last_cons:
@@ -203,11 +202,10 @@ class Parser:
 
         return result_syllable
 
-
     def _parse_last_CV(self, word: Verb) -> list[Verb]:
-        '''
+        """
         Try to parse a CV, CVV consonant from the end of the word
-        '''
+        """
         # try to parse last vowel
         result_vowel = self._parse_last_vowel(word)
         if not result_vowel:
@@ -219,15 +217,14 @@ class Parser:
             result_syllable.extend(self._parse_last_consonant(variation))
 
         return result_syllable
-    
 
     def _recover_stem(self, word: Verb) -> list[Verb]:
-        '''
-        Try and recover stem changes in the root from parsed verb 
-        '''
+        """
+        Try and recover stem changes in the root from parsed verb
+        """
         stem = word.stem
         roots = set()
-        
+
         # remove high tone
         stem = stem.replace("\u0301", "")
 
@@ -246,9 +243,10 @@ class Parser:
 
         return results
 
-
-    def parse_word(self, word: str, no_display: bool = False) -> list[tuple[str]]:
-        '''
+    def parse_word(
+        self, word: str, no_display: bool = False
+    ) -> list[tuple[str, str, str]]:
+        """
         Get possible parsings of a given verb
 
         params:
@@ -257,7 +255,7 @@ class Parser:
 
         returns:
             [list of tuples] - possible parsings in format (prefixes, root, suffixes)
-        '''
+        """
         # make verb object
         normalized = self._normalize_word(word)
         verb = Verb(normalized)

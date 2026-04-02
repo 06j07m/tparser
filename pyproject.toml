@@ -1,20 +1,29 @@
 [build-system]
-requires = ["setuptools >= 77.0.3"]
+requires = ["setuptools ~= 77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "tparser"
-version = "0.2.0"
+version = "0.3.0"
 authors = [
-    {name="Mona Liu", email="monaliu832@gmail.com"},
+    {name="Mona Liu", email="mona.liu.dev@gmail.com"},
 ]
-description = "rule based tlingit verb parser"
+description = "Rule based verb parser for Tlingit"
+readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 
+[project.urls]
+Repository = "https://github.com/06j07m/tparser"
+Issues = "https://github.com/06j07m/tparser/issues"
+Documentation = "https://github.com/06j07m/tparser/wiki"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["tparser*"]
+exclude = ["tests*"]
+namespaces = false
 
 [tool.setuptools.package-data]
 tparser = ["data/*.json"]

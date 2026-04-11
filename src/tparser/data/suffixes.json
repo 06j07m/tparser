@@ -14,12 +14,16 @@
         {"suffix": "u\u0301", "form": "cvc_", "ablaut": false},
         {"suffix": "ya", "form": "cv_", "ablaut": false},
         {"suffix": "wa", "form": "cv_", "ablaut": false},
+        {"suffix": "y\u0308a", "form": "cv_", "ablaut": false},
         {"suffix": "ya\u0301", "form": "cv_", "ablaut": false},
         {"suffix": "wa\u0301", "form": "cv_", "ablaut": false},
+        {"suffix": "y\u0308a\u0301", "form": "cv_", "ablaut": false},
         {"suffix": "yaa", "form": "cv_", "ablaut": false},
         {"suffix": "waa", "form": "cv_", "ablaut": false},
+        {"suffix": "y\u0308aa", "form": "cv_", "ablaut": false},
         {"suffix": "ya\u0301a", "form": "cv_", "ablaut": false},
         {"suffix": "wa\u0301a", "form": "cv_", "ablaut": false},
+        {"suffix": "y\u0308a\u0301a", "form": "cv_", "ablaut": false},
         {"suffix": "yi", "form": "cv_", "ablaut": false},
         {"suffix": "yi\u0301", "form": "cv_", "ablaut": false},
         {"suffix": "yee", "form": "cv_", "ablaut": false},
@@ -43,7 +47,9 @@
         {"suffix": "yan", "form": "cv_", "ablaut": false},
         {"suffix": "ya\u0301n", "form": "cv_", "ablaut": false},
         {"suffix": "wan", "form": "cv_", "ablaut": false},
-        {"suffix": "wa\u0301n", "form": "cv_", "ablaut": false}
+        {"suffix": "wa\u0301n", "form": "cv_", "ablaut": false},
+        {"suffix": "y\u0308an", "form": "cv_", "ablaut": false},
+        {"suffix": "y\u0308a\u0301n", "form": "cv_", "ablaut": false}
     ],
     "modality": [
         {"suffix": "ik\u0331", "form": "cvc_", "ablaut": false},

@@ -11,7 +11,8 @@ class Parser:
     """
 
     def __init__(self):
-        # initialize data
+        """Create instance of a parser and initialize data
+        """
         self._ALPHABET = self._load_json("alphabet.json")
         self._SUFFIXES = self._load_json("suffixes.json")
         self._VOWELS = self._load_json("vowels.json")
@@ -34,23 +35,27 @@ class Parser:
         Return a normalized form of the string
         """
         # strip whitespace
-        norm_whitesp = word.strip()
+        norm = word.strip()
 
-        # separate combining accents
-        norm_combining = ucd.normalize("NFKD", norm_whitesp)
-
-        # normalize captialization
-        norm_case = norm_combining.casefold()
+        # replace underlines with the right one
+        norm = norm.replace("\u0332", "\u0331")
+        print(norm)
 
         # replace apostrophes with correct one
-        norm_apostrophe = norm_case.replace("'", "ʼ").replace("’", "ʼ")
+        norm = norm.replace("\u0027", "\u02bc").replace("\u2019", "\u02bc")
+        
+        # separate combining accents
+        norm = ucd.normalize("NFKD", norm)
+
+        # normalize captialization
+        norm = norm.casefold()
 
         # get rid of other accents
-        norm_noaccent = "".join(
-            [c for c in norm_apostrophe if c in self._ALPHABET["chars"]]
+        norm = "".join(
+            [c for c in norm if c in self._ALPHABET["chars"]]
         )
 
-        return norm_noaccent
+        return norm
 
     def _parse_ending(self, word: Verb, ending_list: list[str]) -> list[Verb]:
         """
@@ -59,8 +64,9 @@ class Parser:
         result = []
         base = word.prefix
 
+        y_variations = ["y", "w", "y\u0308"]
+
         for ending in ending_list:
-            parsed_variations = []
             if base.endswith(ending):
                 # split it right before the ending
                 split_at = len(base) - len(ending)
@@ -77,8 +83,34 @@ class Parser:
                 parsed.meta["ablaut"] = word.meta["ablaut"]
 
                 # add to list of possible results if successful
-                parsed_variations.append(parsed)
-            result.extend(parsed_variations)
+                result.append(parsed)
+
+                # check if ending is one of y/w/umlaut y
+                if ending in y_variations:
+                    y_variations.remove(ending)
+                    y_variation_len = len(ending)
+
+        # if y/w/y umlaut are successfully parsed, then add the other options too
+        if len(y_variations) < 3:
+            print(base, len(base))
+            for y_variation in y_variations:
+                print(y_variation, len(y_variation))
+                # split it right before the ending
+                split_at = len(base) - y_variation_len
+
+                # make new word
+                new_stem = y_variation + word.stem
+                new_suffix = word.suffix
+                new_prefix = base[:split_at]
+
+                parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
+
+                # keep root properties
+                parsed.meta["root_form"] = word.meta["root_form"]
+                parsed.meta["ablaut"] = word.meta["ablaut"]
+
+                # add to list of possible results if successful
+                result.append(parsed)
 
         return result
 
@@ -92,7 +124,6 @@ class Parser:
         base = word.prefix
 
         for suffix in suffix_list:
-            parsed_variations = []
             if base.endswith(suffix["suffix"]):
                 # split it right before the ending
                 split_at = len(base) - len(suffix["suffix"])
@@ -117,14 +148,13 @@ class Parser:
                     parsed.meta["ablaut"] = word.meta["ablaut"]
 
                 # add to list of possible results if successful
-                parsed_variations.append(parsed)
-            result.extend(parsed_variations)
+                result.append(parsed)
 
         return result
 
     def _parse_suffixes(self, word: Verb) -> list[Verb]:
         """
-        Try to parse all possible suffixes (only one suffix though)
+        Try to parse all possible suffixes (only one suffix from each type though)
         """
         result_clause = self._parse_suffix(word, self._SUFFIXES["clause"])
 
@@ -180,7 +210,7 @@ class Parser:
 
     def _parse_last_CVC(self, word: Verb) -> list[Verb]:
         """
-        Try to parse a CVC, CVVC consonant from the end of the word
+        Try to parse a CVC, CVVC syllable from the end of the word
         """
         # try to parse last consonant
         result_last_cons = self._parse_last_consonant(word)
@@ -204,7 +234,7 @@ class Parser:
 
     def _parse_last_CV(self, word: Verb) -> list[Verb]:
         """
-        Try to parse a CV, CVV consonant from the end of the word
+        Try to parse a CV, CVV syllable from the end of the word
         """
         # try to parse last vowel
         result_vowel = self._parse_last_vowel(word)

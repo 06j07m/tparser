@@ -1,0 +1,26 @@
+site_name: tparser Documentation
+nav:
+- Getting started: index.md
+- Private methods:
+  - Parser: parser.md
+  - Verb: verb.md
+theme: cinder
+watch:
+- docs
+plugins:
+- search
+- mkdocstrings:
+    default_handler: python
+    locale: en
+    handlers:
+      python:
+        options:
+          docstring_section_style: list
+          show_root_heading: true
+          show_root_full_path: false
+          show_source: false
+          separate_signature: true
+          show_signature_annotations: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          signature_crossrefs: true

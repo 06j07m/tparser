@@ -1,0 +1,14 @@
+members = true
+docstring_section_style = "list"
+merge_init_into_class = false
+group_by_category = true
+show_category_heading = true
+show_root_heading = true
+show_root_full_path = false
+show_root_members_full_path = false
+show_object_full_path = false
+show_source = false
+show_signature = true
+separate_signature = true
+show_signature_annotations = true
+summary = false

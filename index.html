@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="img/favicon.ico">
 
     
-    <title>Usage - tparser wiki</title>
+    <title>Getting started - tparser Documentation</title>
     
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
@@ -60,7 +60,7 @@
             <!-- Main title -->
 
             
-              <a class="navbar-brand" href=".">tparser wiki</a>
+              <a class="navbar-brand" href=".">tparser Documentation</a>
             
         </div>
 
@@ -71,7 +71,7 @@
                 
                 
                     <li class="active">
-                        <a href=".">Usage</a>
+                        <a href=".">Getting started</a>
                     </li>
                 
                 
@@ -99,6 +99,11 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
                     <li class="disabled">
                         <a rel="prev" >
                             <i class="fas fa-arrow-left"></i> Previous
@@ -119,24 +124,24 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#usage">Usage</a></li>
+        <li class="first-level active"><a href="#parsing-a-word">Parsing a word</a></li>
             <li class="second-level"><a href="#tparser.Parser.parse_word"><code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;parse_word</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="usage">Usage</h1>
+<h1 id="parsing-a-word">Parsing a word</h1>
 
 
 <div class="doc doc-object doc-function">
 
 
-<h2 id="tparser.Parser.parse_word" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">tparser.Parser.parse_word</span>
+<h3 id="tparser.Parser.parse_word" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">tparser.Parser.parse_word</span>
 
 
-</h2>
+</h3>
 <pre class="highlight"><code class="language-python doc-signature">parse_word(word: <span title="str">str</span>, no_display: <span title="bool">bool</span> = False) -&gt; <span title="list">list</span>[<span title="tuple">tuple</span>[<span title="str">str</span>, <span title="str">str</span>, <span title="str">str</span>]]</code></pre>
 
     <div class="doc doc-contents first">
@@ -189,8 +194,35 @@
     <script>var base_url = "."</script>
     
     <script src="js/base.js"></script>
+    <script src="search/main.js"></script>
 
-    <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -236,5 +268,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-04-11 14:59:57.655551+00:00
+Build Date UTC : 2026-04-12 16:17:07.690179+00:00
 -->

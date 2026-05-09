@@ -52,7 +52,7 @@ def main():
     all_test_roots = test_roots + test_roots_2
 
     parser = Parser()
-    parser.parse_word("oolg̲einch")
+    parser.parse_word("x̱ʼeishgwéik")
 
 
 if __name__ == "__main__":

@@ -86,8 +86,8 @@ class Parser:
                 parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
 
                 # keep root properties
-                parsed.meta["root_form"] = word.meta["root_form"]
-                parsed.meta["ablaut"] = word.meta["ablaut"]
+                parsed.root_form = word.root_form
+                parsed.ablaut = word.ablaut
 
                 # add to list of possible results if successful
                 result.append(parsed)
@@ -113,8 +113,8 @@ class Parser:
                 parsed = Verb(new_prefix, stem=new_stem, suffix=new_suffix)
 
                 # keep root properties
-                parsed.meta["root_form"] = word.meta["root_form"]
-                parsed.meta["ablaut"] = word.meta["ablaut"]
+                parsed.root_form = word.root_form
+                parsed.ablaut = word.ablaut
 
                 # add to list of possible results if successful
                 result.append(parsed)
@@ -144,15 +144,15 @@ class Parser:
                 # indicate in the new word if it's a CV-root suffix
                 # or a CVC-root suffix (if it matters for the suffix)
                 if suffix["form"] in ("cvc_", "cv_"):
-                    parsed.meta["root_form"] = suffix["form"]
+                    parsed.root_form = suffix["form"]
                 else:
-                    parsed.meta["root_form"] = word.meta["root_form"]
+                    parsed.root_form = word.root_form
 
                 # indicate whether vowel has been changed
                 if suffix["ablaut"]:
-                    parsed.meta["ablaut"] = True
+                    parsed.ablaut = True
                 else:
-                    parsed.meta["ablaut"] = word.meta["ablaut"]
+                    parsed.ablaut = word.ablaut
 
                 # add to list of possible results if successful
                 result.append(parsed)
@@ -270,11 +270,10 @@ class Parser:
             stem = stem.replace(long, short)
 
         # change vowel back to a or u if ablaut
-        if word.meta["ablaut"]:
+        if word.ablaut:
             roots.add(stem.replace("e", "a"))
             roots.add(stem.replace("e", "u"))
-        else:
-            roots.add(stem)
+        roots.add(stem)
 
         results = [Verb(word.prefix, word.stem, word.suffix, r) for r in roots]
 
@@ -305,14 +304,20 @@ class Parser:
         if result_suffix:
             for variation in result_suffix:
                 # depending on whether suffix attaches to CV or CVC root
-                if variation.meta["root_form"] == "cvc":
+                if variation.root_form == "cvc_":
                     parsed.extend(self._parse_last_CVC(variation))
-                elif variation.meta["root_form"] == "cv":
+                elif variation.root_form == "cv_":
                     parsed.extend(self._parse_last_CV(variation))
                 else:
-                    parsed.extend(self._parse_last_CVC(variation))
+                    # make sure no roots ending in consonant have ablaut
+                    cvc_parsed = self._parse_last_CVC(variation)
+                    for p in cvc_parsed:
+                        p.ablaut = False
+                    parsed.extend(cvc_parsed)
+
                     parsed.extend(self._parse_last_CV(variation))
-        # parse last syllable WITHOUT parsing suffix
+
+        # parse last syllable WITHOUT parsing suffix (no possbility of ablaut)
         parsed.extend(self._parse_last_CVC(verb))
         parsed.extend(self._parse_last_CV(verb))
 

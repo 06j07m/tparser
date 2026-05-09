@@ -15,10 +15,8 @@ class Verb:
         self.root = root
         # information about the verb (root) like form, tone,
         # phonetic/orthographic changes, etc.
-        self.meta = {
-            "root_form": "",
-            "ablaut": False
-        }
+        self.root_form = ""
+        self.ablaut = False
 
     def __str__(self) -> str:
         '''

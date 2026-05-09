@@ -17,6 +17,34 @@ def extract_test_data(filepath: str) -> tuple[list[str], list[str]]:
     return verb_col.to_list(), root_col.to_list()
 
 
+def test_parser(verbs: list[str], true_answers: list[str], filepath: str) -> None:
+    """
+    Tests each verb in list and saves results to Excel file
+    """
+    parser = Parser()
+
+    pred_answers = []
+
+    for i in range(len(verbs)):
+        verb = verbs[i]
+        actual_root = parser._normalize_word(true_answers[i])
+        pred = parser.parse_word(verb, no_display=True)
+        pred_roots = [p[1] for p in pred]
+        result = actual_root in pred_roots
+
+        pred_answers.append(
+            {
+                "verb": verb,
+                "actual_root": actual_root,
+                "parsed_roots": pred_roots,
+                "success": result,
+            }
+        )
+
+    results_df = pd.DataFrame(pred_answers)
+    results_df.to_excel(filepath, index=False)
+
+
 def main():
     test_verbs, test_roots = extract_test_data("tests/test_data_swanton.csv")
     test_verbs_2, test_roots_2 = extract_test_data("tests/test_data_eggleston.csv")
@@ -24,28 +52,7 @@ def main():
     all_test_roots = test_roots + test_roots_2
 
     parser = Parser()
-    parser.parse_word("anx̲alg̲én")
-
-    # results = []
-
-    # for i in range(len(all_test_verbs)):
-    #     verb = all_test_verbs[i]
-    #     actual_root = parser._normalize_word(all_test_roots[i])
-    #     pred = parser.parse_word(verb, no_display=True)
-    #     pred_roots = [p[1] for p in pred]
-    #     result = actual_root in pred_roots
-
-    #     results.append(
-    #         {
-    #             "verb": verb,
-    #             "actual_root": actual_root,
-    #             "parsed_roots": pred_roots,
-    #             "success": result,
-    #         }
-    #     )
-
-    # results_df = pd.DataFrame(results)
-    # results_df.to_excel("test_results.xlsx", index=False)
+    parser.parse_word("oolg̲einch")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,18 @@ class Parser:
         self._SUFFIXES = self._load_json("suffixes.json")
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
-        self._VOWEL_MAP = {"ee": "i", "ei": "e", "aa": "a", "oo": "u"}
+        self._REPLACE_MAP = str.maketrans({
+            "\u0332": "\u0331",
+            "\u0320": "\u0331",
+            "\u0027": "\u02bc",
+            "\u2019": "\u02bc"
+        })
+        self._VOWEL_MAP = {
+            "ee": "i", 
+            "ei": "e", 
+            "aa": "a", 
+            "oo": "u"
+        }
 
     def _load_json(self, filename: str):
         """
@@ -37,12 +48,8 @@ class Parser:
         # strip whitespace
         norm = word.strip()
 
-        # replace underlines with the right one
-        norm = norm.replace("\u0332", "\u0331")
-        print(norm)
-
-        # replace apostrophes with correct one
-        norm = norm.replace("\u0027", "\u02bc").replace("\u2019", "\u02bc")
+        # replace low bar and apostrophe with the right one
+        norm = norm.translate(self._REPLACE_MAP)
         
         # separate combining accents
         norm = ucd.normalize("NFKD", norm)

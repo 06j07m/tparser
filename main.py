@@ -24,27 +24,28 @@ def main():
     all_test_roots = test_roots + test_roots_2
 
     parser = Parser()
+    parser.parse_word("anx̲alg̲én")
 
-    results = []
+    # results = []
 
-    for i in range(len(all_test_verbs)):
-        verb = all_test_verbs[i]
-        actual_root = parser._normalize_word(all_test_roots[i])
-        pred = parser.parse_word(verb, no_display=True)
-        pred_roots = [p[1] for p in pred]
-        result = actual_root in pred_roots
+    # for i in range(len(all_test_verbs)):
+    #     verb = all_test_verbs[i]
+    #     actual_root = parser._normalize_word(all_test_roots[i])
+    #     pred = parser.parse_word(verb, no_display=True)
+    #     pred_roots = [p[1] for p in pred]
+    #     result = actual_root in pred_roots
 
-        results.append(
-            {
-                "verb": verb,
-                "actual_root": actual_root,
-                "parsed_roots": pred_roots,
-                "success": result,
-            }
-        )
+    #     results.append(
+    #         {
+    #             "verb": verb,
+    #             "actual_root": actual_root,
+    #             "parsed_roots": pred_roots,
+    #             "success": result,
+    #         }
+    #     )
 
-    results_df = pd.DataFrame(results)
-    results_df.to_excel("test_results.xlsx", index=False)
+    # results_df = pd.DataFrame(results)
+    # results_df.to_excel("test_results.xlsx", index=False)
 
 
 if __name__ == "__main__":

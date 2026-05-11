@@ -1,6 +1,7 @@
+import json
 import unicodedata as ucd
 import importlib.resources as rsrc
-import json
+from collections import deque
 
 from .verb import Verb
 
@@ -15,6 +16,7 @@ class Parser:
         """
         self._ALPHABET = self._load_json("alphabet.json")
         self._SUFFIXES = self._load_json("suffixes.json")
+        self._SUFFIX_TYPES = {i: type for i, type in enumerate(self._SUFFIXES)}
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
         self._REPLACE_MAP = str.maketrans({
@@ -99,9 +101,7 @@ class Parser:
 
         # if y/w/y umlaut are successfully parsed, then add the other options too
         if len(y_variations) < 3:
-            print(base, len(base))
             for y_variation in y_variations:
-                print(y_variation, len(y_variation))
                 # split it right before the ending
                 split_at = len(base) - y_variation_len
 
@@ -163,27 +163,24 @@ class Parser:
         """
         Try to parse all possible suffixes (only one suffix from each type though)
         """
-        result_clause = self._parse_suffix(word, self._SUFFIXES["clause"])
+        result = []
 
-        result_tense = self._parse_suffix(word, self._SUFFIXES["tense"])
-        for variation in result_clause:
-            result_tense.extend(self._parse_suffix(variation, self._SUFFIXES["tense"]))
+        q = deque()
 
-        result_mod = self._parse_suffix(word, self._SUFFIXES["modality"])
-        for variation in result_tense:
-            result_mod.extend(self._parse_suffix(variation, self._SUFFIXES["modality"]))
+        # start with word itself
+        q.append((word, -1))
 
-        result_rep = self._parse_suffix(word, self._SUFFIXES["repetitive"])
-        for variation in result_mod:
-            result_rep.extend(
-                self._parse_suffix(variation, self._SUFFIXES["repetitive"])
-            )
+        while q:
+            # get next variation and last type of suffix that has been tried
+            variation, parsed_type = q.pop()
 
-        result_misc = self._parse_suffix(word, self._SUFFIXES["misc"])
-        for variation in result_rep:
-            result_misc.extend(self._parse_suffix(variation, self._SUFFIXES["misc"]))
-
-        return result_clause + result_tense + result_mod + result_rep + result_misc
+            # add all "children" (types of suffix after current) to queue
+            for i in range(parsed_type + 1, len(self._SUFFIX_TYPES)):
+                for next_variation in self._parse_suffix(variation, self._SUFFIXES[self._SUFFIX_TYPES[i]]):
+                    q.append((next_variation, i))
+                    result.append(next_variation)
+                       
+        return result
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:
         """

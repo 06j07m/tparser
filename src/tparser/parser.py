@@ -1,3 +1,35 @@
+# Copyright (c) 2026 Mona Liu
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+"""Core parser functionality
+
+Classes:
+    Parser
+
+Example usage:
+
+    from tparser import Parser
+
+    parser = Parser()
+    parser.parse_word("nag̱anáanín")
+"""
+
 import json
 import unicodedata as ucd
 import importlib.resources as rsrc
@@ -7,34 +39,46 @@ from .verb import Verb
 
 
 class Parser:
-    """
-    Parser for verbs
+    """Parses verbs
+
+    Attributes:
+        _ALPHABET (dict): maps "chars" to a list of characters in the alphabet
+        _SUFFIXES (dict): maps suffix types to lists of suffixes of that
+            type and their properties
+        _SUFFIX_TYPES (dict): maps integers to suffix types (in order that they
+            appear in `_SUFFIXES`)
+        _VOWELS (dict): maps vowel types (length and tone) to lists of vowels
+        _CONSONANTS (dict): maps consonant types (short and long) to list of consonants
+        _REPLACE_MAP (dict): maps common variations of diacritics to the correct ones
+        _VOWEL_MAP (dict): maps long vowels to short vowels
     """
 
     def __init__(self):
-        """Create instance of a parser and initialize data
-        """
+        """Create parser and initialize data"""
+
         self._ALPHABET = self._load_json("alphabet.json")
         self._SUFFIXES = self._load_json("suffixes.json")
         self._SUFFIX_TYPES = {i: type for i, type in enumerate(self._SUFFIXES)}
         self._VOWELS = self._load_json("vowels.json")
         self._CONSONANTS = self._load_json("consonants.json")
-        self._REPLACE_MAP = str.maketrans({
-            "\u0332": "\u0331",
-            "\u0320": "\u0331",
-            "\u0027": "\u02bc",
-            "\u2019": "\u02bc"
-        })
-        self._VOWEL_MAP = {
-            "ee": "i", 
-            "ei": "e", 
-            "aa": "a", 
-            "oo": "u"
-        }
+        self._REPLACE_MAP = str.maketrans(
+            {
+                "\u0332": "\u0331",
+                "\u0320": "\u0331",
+                "\u0027": "\u02bc",
+                "\u2019": "\u02bc",
+            }
+        )
+        self._VOWEL_MAP = {"ee": "i", "ei": "e", "aa": "a", "oo": "u"}
 
-    def _load_json(self, filename: str):
-        """
-        Read json from a file in the package
+    def _load_json(self, filename: str) -> dict:
+        """Read json from a file in the package
+
+        Args:
+            filename: file to read
+
+        Returns:
+            contents of file
         """
         with (
             rsrc.files("tparser.data")
@@ -44,15 +88,23 @@ class Parser:
             return json.load(f)
 
     def _normalize_word(self, word: str) -> str:
-        """
-        Return a normalized form of the string
+        """Return a normalized form of the verb
+
+        Removes whitespace and accents that are not considered during
+        parsing. Also normalizes diacritics and capitalization.
+
+        Args:
+            word: a verb
+
+        Returns:
+            normalized version of `word`
         """
         # strip whitespace
         norm = word.strip()
 
         # replace low bar and apostrophe with the right one
         norm = norm.translate(self._REPLACE_MAP)
-        
+
         # separate combining accents
         norm = ucd.normalize("NFKD", norm)
 
@@ -60,15 +112,20 @@ class Parser:
         norm = norm.casefold()
 
         # get rid of other accents
-        norm = "".join(
-            [c for c in norm if c in self._ALPHABET["chars"]]
-        )
+        norm = "".join([c for c in norm if c in self._ALPHABET["chars"]])
 
         return norm
 
     def _parse_ending(self, word: Verb, ending_list: list[str]) -> list[Verb]:
-        """
-        Try to parse given endings from the right of the word
+        """Parse an substring ("ending") from the right of the verb
+
+        Args:
+            word: verb to start with
+            ending_list: list of endings to try and parse
+
+        Returns:
+            list of parsings with any one of the endings from the list parsed,
+            empty if none can be parsed
         """
         result = []
         base = word.prefix
@@ -124,8 +181,15 @@ class Parser:
     def _parse_suffix(
         self, word: Verb, suffix_list: list[dict[str, str]]
     ) -> list[Verb]:
-        """
-        Try to parse given suffixes from the right of the word
+        """Parse a rightmost suffix from a list
+
+        Args:
+            word: verb to start with
+            ending_list: list of suffixes to try and parse
+
+        Returns:
+            list of parsings with any one of the suffixes from the list parsed,
+            empty if verb doesn't end with any of them
         """
         result = []
         base = word.prefix
@@ -160,8 +224,17 @@ class Parser:
         return result
 
     def _parse_suffixes(self, word: Verb) -> list[Verb]:
-        """
-        Try to parse all possible suffixes (only one suffix from each type though)
+        """Parse all possible suffixes
+         
+        Considers at most one suffix of each type, in the order of
+        _SUFFIX_TYPES. Uses depth first search to go through parse tree.
+
+        Args:
+            word: verb to start with
+
+        Returns:
+            list of parsings with all suffixes parsed, empty if the verb
+            does not have a suffix (from the dataset)
         """
         result = []
 
@@ -176,15 +249,23 @@ class Parser:
 
             # add all "children" (types of suffix after current) to queue
             for i in range(parsed_type + 1, len(self._SUFFIX_TYPES)):
-                for next_variation in self._parse_suffix(variation, self._SUFFIXES[self._SUFFIX_TYPES[i]]):
+                for next_variation in self._parse_suffix(
+                    variation, self._SUFFIXES[self._SUFFIX_TYPES[i]]
+                ):
                     q.append((next_variation, i))
                     result.append(next_variation)
-                       
+
         return result
 
     def _parse_last_consonant(self, word: Verb) -> list[Verb]:
-        """
-        Try to parse rightmost consonant
+        """Parse rightmost consonant
+
+        Args:
+            word: verb to start with
+
+        Returns:
+            list of parsings with any one consonant parsed, empty if 
+            verb does not end with a consonant
         """
         result_mult = self._parse_ending(word, self._CONSONANTS["multiple"])
 
@@ -196,8 +277,14 @@ class Parser:
         return self._parse_ending(word, self._CONSONANTS["single"])
 
     def _parse_last_vowel(self, word: Verb) -> list[Verb]:
-        """
-        Try to parse rightmost vowel
+        """Parse rightmost vowel
+
+        Args:
+            word: verb to start with
+
+        Returns:
+            list of parsings with any one vowel parsed, empty if verb does
+            not end with a vowel
         """
         result_long = self._parse_ending(
             word, self._VOWELS["long_high"] + self._VOWELS["long_low"]
@@ -213,8 +300,14 @@ class Parser:
         )
 
     def _parse_last_CVC(self, word: Verb) -> list[Verb]:
-        """
-        Try to parse a CVC, CVVC syllable from the end of the word
+        """Parse an CVC or CVVC syllable from the right of the verb
+
+        Args:
+            word: verb to start with
+
+        Returns:
+            list of parsings with last syllable parsed, empty if verb
+            does not end with a CVC/CVVC syllable
         """
         # try to parse last consonant
         result_last_cons = self._parse_last_consonant(word)
@@ -237,8 +330,14 @@ class Parser:
         return result_syllable
 
     def _parse_last_CV(self, word: Verb) -> list[Verb]:
-        """
-        Try to parse a CV, CVV syllable from the end of the word
+        """Parse a CV or CVV syllable from the right of the verb
+
+        Args:
+            word: verb to start with
+
+        Returns:
+            list of parsings with last syllable parsed, empty if verb
+            does not end with a CV/CVV syllable
         """
         # try to parse last vowel
         result_vowel = self._parse_last_vowel(word)
@@ -252,9 +351,17 @@ class Parser:
 
         return result_syllable
 
-    def _recover_stem(self, word: Verb) -> list[Verb]:
-        """
-        Try and recover stem changes in the root from parsed verb
+    def _recover_root(self, word: Verb) -> list[Verb]:
+        """Undo stem changes to recover possible roots
+
+        Removes tones and changes long vowels to their corresponding short
+        vowel. Adds possible roots before ablaut, if applicable
+
+        Args:
+            word: parsed verb to recover root from 
+
+        Returns:
+            list of parsed verbs with the `root` attribute set
         """
         stem = word.stem
         roots = set()
@@ -279,15 +386,15 @@ class Parser:
     def parse_word(
         self, word: str, no_display: bool = False
     ) -> list[tuple[str, str, str]]:
-        """
-        Get possible parsings of a given verb
+        """Get possible parsings of a given verb
 
-        params:
-            word [str] - the verb, as a string
-            no_display [bool] - set to True to suppress output
+        Args:
+            word: the verb, as a string
+            no_display: whether the results should be printed ("displayed") 
+                in addition to being returned
 
-        returns:
-            [list of tuples] - possible parsings in format (prefixes, root, suffixes)
+        Returns:
+            Possible parsings in format (prefixes, root, suffixes)
         """
         # make verb object
         normalized = self._normalize_word(word)
@@ -320,7 +427,7 @@ class Parser:
 
         final = []
         for p in parsed:
-            final.extend(self._recover_stem(p))
+            final.extend(self._recover_root(p))
 
         # convert to friendly representation
         verbs = [p.to_string() for p in final]

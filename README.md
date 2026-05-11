@@ -32,4 +32,4 @@ verb root options: wan, ni, nik
 [('akaa', 'wan', 'ík'), ('akaawa', 'ni', 'k'), ('akaawa', 'nik', '')]
 ```
 
-See the [project wiki](https://github.com/06j07m/tparser/wiki) for full documentation.
+See the [project wiki](https://06j07m.github.io/tparser/) for full documentation.

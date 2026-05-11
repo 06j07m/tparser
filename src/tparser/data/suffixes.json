@@ -104,7 +104,6 @@
         {"suffix": "n", "form": "cv_", "ablaut": true},
         {"suffix": "y", "form": "cv_", "ablaut": false},
         {"suffix": "y\u0308", "form": "cv_", "ablaut": false},
-        {"suffix": "w", "form": "cv_", "ablaut": false},
         {"suffix": "ch\u02bc", "form": "c_", "ablaut": false},
         {"suffix": "a\u0301ch\u02bc", "form": "cvc_", "ablaut": false},
         {"suffix": "sh", "form": "c'_", "ablaut": false},

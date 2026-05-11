@@ -1,7 +1,7 @@
 site_name: tparser Documentation
 nav:
-- Getting started: index.md
-- Private methods:
+- How to use: index.md
+- Classes:
   - Parser: parser.md
   - Verb: verb.md
 theme: cinder

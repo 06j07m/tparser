@@ -1,3 +1,3 @@
 ::: tparser.Parser
     options:
-      filters: ["^_"]
+        filters: []

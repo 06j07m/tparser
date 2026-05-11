@@ -185,7 +185,7 @@ class Parser:
 
         Args:
             word: verb to start with
-            ending_list: list of suffixes to try and parse
+            suffix_list: list of suffixes to try and parse
 
         Returns:
             list of parsings with any one of the suffixes from the list parsed,
